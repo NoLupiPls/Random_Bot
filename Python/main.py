@@ -8,6 +8,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import random
 from save import BotDB
 
+
 #   TOKEN   #
 bot = Bot(token="5385406422:AAGnCUR7gRZ8xTZgr8rdRY4NIXbktJORlNg")
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -34,11 +35,13 @@ def upd_tab_val(user_id, us_starting):
     return conn.commit()
 '''
 
+
 #      VARIABLE      #
 xr = 0
     
 nufl = None
 a = 0
+
 
 #      MESSAGE      #
 @dp.message_handler(commands=["start"])
@@ -67,8 +70,9 @@ async def welcome(message: types.Message):
 async def volume(message: types.Message):
     
     
-    def add_user(self, user_id):
-        self.cursor.execute('INSERT INTO users (user_id, count) VALUES (?, ?)', xr, user_id)
+    def add_user(self):
+        user_id = message.from_user.id
+        self.cursor.execute('INSERT INTO users (user_id, count) VALUES (?, ?)', (xr, user_id))
         return self.conn.commit()
 
 
@@ -100,6 +104,7 @@ async def volume(message: types.Message):
     usvol = xr
     upd_tab_val(user_id=us_id, us_starting=usvol)
     '''
+    
     
 #      MESSAGE  FOR  DIRECT      #
 '''
