@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 
 #   CONNECT  SQL   #
 
-BotDB = BotDB('DB/db.db')
+BotDB = BotDB('./DB/db.db')
 
 
 
@@ -37,10 +37,12 @@ def upd_tab_val(user_id, us_starting):
 
 
 #      VARIABLE      #
-xr = 0
     
 nufl = None
 a = 0
+
+class Wait(StatesGroup):
+    count_vol = State()
 
 
 #      MESSAGE      #
@@ -66,42 +68,45 @@ async def welcome(message: types.Message):
 
     db_tab_val(user_id=us_id, user_name=us_name, user_surname=us_sname, username=username)
     '''
-@dp.message_handler(commands=["check"])
-async def volume(message: types.Message):
+@dp.message_handler(commands="check", state="*")
+async def volume(message: types.Message, state: FSMContext):
     
     
-    def add_user(self):
-        user_id = message.from_user.id
-        self.cursor.execute('INSERT INTO users (user_id, count) VALUES (?, ?)', (xr, user_id))
-        return self.conn.commit()
+    #def add_user(self, user_id):
+        #self.cursor.execute('INSERT INTO users (user_id, count) VALUES (?, ?)', (count_vol, user_id))
+        #return self.conn.commit()
 
 
     if(not BotDB.user_exists(message.from_user.id)):
-        add_user(message.from_user.id)
+        count_vol = 0
+        BotDB.add_user(message.from_user.id, count_vol)
         
-    if(BotDB.vol_exists(message.from_user.id)):
-        
-        global xr
         rand = int(random.randint(-5, 10))
-        su = rand + a + int(xr)
-        #      FIRST   NAME     #   
-        if rand == 0:
-            xr = str(su)
-            await bot.edit_message_text(f"{message.from_user.first_name}, твоё количство хромосом не изменилось, их количество равно " + xr + ' шт')
-        elif rand > 0:
-            xr = str(su)
-            await bot.edit_message_text(f"{message.from_user.first_name}, твоё количство хромосом увеличилось, их количество равно " + xr + ' шт')
-        elif rand < 0:
-            xr = str(su)
-            await bot.edit_message_text(f"{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + xr + ' шт')
+        su = rand + a + int(count_vol)  
+        count_vol = str(su)
         
+
+        await state.update_data(count_vol = count_vol)
+        await message.reply(f"{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + count_vol + ' шт', chat_id = message.from_user.id)
+        await Wait.count_vol.set()
+        
+    if(BotDB.vol_exists(message.from_user.id, count_vol)):
+        
+        rand = int(random.randint(-5, 10))
+        su = rand + a + int(count_vol)  
+        count_vol = int(su)
+        
+
+        await state.update_data(count_vol = count_vol)
+        await message.reply(f"{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + count_vol + ' шт')
+        await Wait.count_vol.set()
         
         
         
     '''
     us_id = message.from_user.id
-    xr = str(su)
-    usvol = xr
+    count_vol = str(su)
+    usvol = count_vol
     upd_tab_val(user_id=us_id, us_starting=usvol)
     '''
     
