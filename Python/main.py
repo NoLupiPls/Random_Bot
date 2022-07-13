@@ -21,7 +21,8 @@ BotDB = BotDB('./DB/db.db')
 
 
 
-
+base = sqlite3.connect('./DB/db.db')
+cur = base.cursor()
 
 '''
 conn = sqlite3.connect('../RandomBot-1/DB/db.db', check_same_thread=False)
@@ -36,13 +37,17 @@ def upd_tab_val(user_id, us_starting):
 '''
 
 
+
 #      VARIABLE      #
-    
-nufl = None
+
+count_vol = 0
+
 a = 0
+
 
 class Wait(StatesGroup):
     count_vol = State()
+
 
 
 #      MESSAGE      #
@@ -54,8 +59,7 @@ async def welcome(message: types.Message):
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
 
-    nufl = 1
-    
+
     await message.answer("Привет! Здесь ты можешь узнать сколько у тебя хромосом"
                          "\nОт -5, до +10 за одну команду"
                          "\nПо команде /check", reply_markup=keyboard)
@@ -68,39 +72,76 @@ async def welcome(message: types.Message):
 
     db_tab_val(user_id=us_id, user_name=us_name, user_surname=us_sname, username=username)
     '''
-@dp.message_handler(commands="check", state="*")
-async def volume(message: types.Message, state: FSMContext):
+@dp.message_handler(commands="check")
+async def volume(message: types.Message):
     
-    
+    count_vol = 0
+        
+    rand = int(random.randint(-5, 10))
+        
+    su = rand + a + int(count_vol)  
+    count_vol = int(su)
+    user_id = message.from_user.id
+
+    sel = cur.execute('SELECT count_vol = ? FROM users WHERE user_id = ?', (user_id, count_vol,))
     #def add_user(self, user_id):
         #self.cursor.execute('INSERT INTO users (user_id, count) VALUES (?, ?)', (count_vol, user_id))
         #return self.conn.commit()
 
-
     if(not BotDB.user_exists(message.from_user.id)):
+        
         count_vol = 0
-        BotDB.add_user(message.from_user.id, count_vol)
         
         rand = int(random.randint(-5, 10))
-        su = rand + a + int(count_vol)  
-        count_vol = str(su)
         
-
-        await state.update_data(count_vol = count_vol)
-        await message.reply(f"{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + count_vol + ' шт', chat_id = message.from_user.id)
-        await Wait.count_vol.set()
-        
-    if(BotDB.vol_exists(message.from_user.id, count_vol)):
-        
-        rand = int(random.randint(-5, 10))
         su = rand + a + int(count_vol)  
         count_vol = int(su)
-        
+        BotDB.add_user(message.from_user.id, count_vol)
 
-        await state.update_data(count_vol = count_vol)
-        await message.reply(f"{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + count_vol + ' шт')
+        await message.reply(f"11.{message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + str(count_vol) + ' шт')
         await Wait.count_vol.set()
         
+        
+    if(BotDB.vol_exists(message.from_user.id)):
+        
+        user_id = message.from_user.id
+
+        sel = cur.execute('SELECT count_vol FROM users WHERE user_id', (user_id, count_vol,))
+        print(sel)
+        count_vol = el
+        
+        for el in sel:
+            el = int(el)
+            
+        rand = int(random.randint(-5, 10))
+        
+        su = rand + a + int(count_vol)  
+        count_vol = int(su)
+        BotDB.upd_vol(message.from_user.id, count_vol)
+        
+        await message.reply(f"22. {message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + str(count_vol) + ' шт')
+        await Wait.count_vol.set()
+        
+        
+    else:
+        user_id = message.from_user.id
+
+        sel = cur.execute('SELECT count_vol FROM users WHERE user_id = ?', (user_id,))
+        
+        
+       
+        
+        lol = sum(sel)
+        
+            
+        rand = int(random.randint(-5, 10))
+        count_vol = lol
+        su = rand + a + int(count_vol)  
+        count_vol = int(su)
+        BotDB.upd_vol(message.from_user.id, count_vol)
+        
+        await message.reply(f"22. {message.from_user.first_name}, твоё количство хромосом уменьшилось, их количество равно " + str(count_vol) + ' шт')
+        await Wait.count_vol.set()
         
         
     '''
@@ -109,6 +150,8 @@ async def volume(message: types.Message, state: FSMContext):
     usvol = count_vol
     upd_tab_val(user_id=us_id, us_starting=usvol)
     '''
+
+
     
     
 #      MESSAGE  FOR  DIRECT      #
