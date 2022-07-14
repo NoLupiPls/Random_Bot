@@ -9,7 +9,7 @@ from save import BotDB
 
 
 #   TOKEN   #
-bot = Bot(token="5385406422:AAGnCUR7gRZ8xTZgr8rdRY4NIXbktJORlNg")
+bot = Bot(token="538")
 dp = Dispatcher(bot, storage=MemoryStorage())
 logging.basicConfig(level=logging.INFO)
 
