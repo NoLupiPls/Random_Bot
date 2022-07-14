@@ -1,4 +1,3 @@
-from email import message
 import logging
 import sqlite3
 from aiogram import Bot, Dispatcher, executor, types
